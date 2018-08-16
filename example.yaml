@@ -1,0 +1,11 @@
+- become: true
+  become_method: sudo
+  gather_facts: true
+  hosts: jenkins
+  roles:
+  - {role: gitlab}
+  - {role: jenkins}
+  - {role: mongodb}
+  - {role: mysql}
+  - {role: php}
+  

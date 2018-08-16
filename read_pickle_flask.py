@@ -1,49 +1,52 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Jun 16 16:46:27 2018
-
-@author: Deepak.J
-"""
-
-#import pickle
 from flask import Flask, request
-#from flasgger import Swagger    
-#import numpy as np
-#import pandas as pd
+import yaml
 import json
-#with open('./rf.pkl', 'rb') as model_file:
-#    model = pickle.load(model_file)
-
 app = Flask(__name__)
 
-#swagger = Swagger(app)
 
-@app.route("/predict")
-def predict_iris():
-    """Example endpoint returning a prediction of iris data
-    ---
-    parameters:
-      - name: s_length
-        in: query
-        type: number
-        required: true
-    """
+@app.route("/devops")
+def home_page():
     s_length = request.args.get("s_length")
-#    s_width = request.args.get("s_width")
-#    p_length = request.args.get("p_length")
-#    p_width = request.args.get("p_width")
-
-#    prediction = model.predict(np.array([[s_length, s_width, p_length, p_width]]))
-    return str("Hello World" + s_length)
+    return str("Hello DevOps " + s_length)
 
 
-@app.route("/predict_file", methods=['POST'])
-def predict_file():
-    #return request.get_jsons()
-    return str(request.files.get_json("input"))
+def clear_value():
+    with open('example.yaml') as f:
+        doc = yaml.load(f)
+
+    doc[0]['roles'] = []
+    with open('example.yaml', 'w') as f:
+       yaml.dump(doc, f)
+
+def set_value(value):
+    with open('example.yaml') as f:
+        doc = yaml.load(f)
+
+    if doc[0]['roles'] == None:
+        doc[0]['roles'] = []
+
+    doc[0]['roles'].append({'role': value})
+
+    with open('example.yaml', 'w') as f:
+       yaml.dump(doc, f)
 
 
+@app.route("/json_file", methods=['POST'])
+def json_file():
+    clear_value()
+    input_data=request.get_json("input")
+    #
+    # tasks_name= input_data[0]["tasks"]
+    for item in input_data:
+        # counter = 0
+        arr = ['SCM', 'CI', 'DATABASE', 'APP']
+        for key in arr:
+            if key in item:
+                for task in item[key]:
+                    if item[key][task]:
+                        set_value(task)
 
 
+    return 'success'
 if __name__=='__main__':
    app.run(port=8080)
